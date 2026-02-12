@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained();
             $table->foreignId('category_id')->constrained()->restrictOnDelete();
             $table->string('title');
             $table->string('slug')->unique();
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'pending', 'approved', 'rejected'])->default('draft');
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

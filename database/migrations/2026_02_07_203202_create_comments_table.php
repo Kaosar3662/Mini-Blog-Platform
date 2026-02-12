@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('post_id')->constrained();
+            $table->foreignId('user_id')->constrained();
+            // $table->unsignedBigInteger('user_id');
+            // $table->foreign('user_id')->references('id')->on('users');
             $table->foreignId('parent_id')
                   ->nullable()
                   ->constrained('comments')
@@ -22,6 +24,7 @@ return new class extends Migration
             $table->text('comment_text');
             $table->enum('status', ['pending', 'approved', 'hidden'])->default('pending');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -33,3 +36,4 @@ return new class extends Migration
         Schema::dropIfExists('comments');
     }
 };
+
