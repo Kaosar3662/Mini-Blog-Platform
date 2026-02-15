@@ -17,6 +17,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'email_verified_at',            // added to allow updating when verified
+        'email_verification_token',    // for blogger email confirmation
+        'password_reset_token',        // for all users forgot password
+        'password_reset_expires_at',   // optional expiry for reset token
     ];
 
     protected $hidden = [
@@ -26,6 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password_reset_expires_at' => 'datetime',
         'password' => 'hashed',
     ];
 
