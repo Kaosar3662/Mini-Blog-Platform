@@ -137,14 +137,14 @@ class PostController extends BaseController
         }
         $post->status = $status;
 
+        //TODO: Add a Helper for Slug Making
+
         // Generate unique slug if title changed
         if ($request->has('title') && $request->title !== $post->title) {
             $baseSlug = Str::slug($request->title);
             $newSlug = $baseSlug;
-            $counter = 1;
             while (Post::where('slug', $newSlug)->where('id', '!=', $post->id)->exists()) {
-                $newSlug = $baseSlug . '-' . $counter;
-                $counter++;
+                $newSlug = $baseSlug . '-' . date('sihdmy');
             }
             $post->slug = $newSlug;
         }

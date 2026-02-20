@@ -62,9 +62,7 @@ class AuthController extends BaseController
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return $this->sendError('The credentials are wrong.', null, 401);
         }
-
         $token = $user->createToken($user->role . '-token')->plainTextToken;
-
         return $this->sendResponse([
             'user' => $user->name,
             'role' => $user->role,

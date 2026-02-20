@@ -11,8 +11,19 @@ class AdminCategoryController extends BaseController
 {
     public function index()
     {
-        $categories = Category::select('id', 'name', 'slug')->get();
-        return $this->sendResponse($categories, 'Categories retrieved successfully.');
+        $search = request()->query('search');
+        $limit = (int) request()->query('limit', 20);
+        $offset = (int) request()->query('offset', 0);
+        $query = Category::select('id', 'name', 'slug');
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+        $total = $query->count();
+        $categories = $query->limit($limit)->offset($offset)->get();
+        return $this->sendResponse([
+            'total' => $total,
+            'data' => $categories,
+        ], 'Categories retrieved successfully.');
     }
 
     public function store(Request $request)
@@ -54,7 +65,7 @@ class AdminCategoryController extends BaseController
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
         $category->update([
