@@ -17,6 +17,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'role',
+        'status',
         'email_verified_at',            // added to allow updating when verified
         'email_verification_token',    // for blogger email confirmation
         'password_reset_token',        // for all users forgot password

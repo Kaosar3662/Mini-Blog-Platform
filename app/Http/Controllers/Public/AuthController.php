@@ -59,6 +59,17 @@ class AuthController extends BaseController
 
         $user = User::where('email', $request->email)->first();
 
+        if (!$user) {
+            return $this->sendError('No user found with this email.', null, 404);
+        }
+
+        if ($user->status !== 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is Disabled or Deleted.'
+            ], 403);
+        }
+
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return $this->sendError('The credentials are wrong.', null, 401);
         }

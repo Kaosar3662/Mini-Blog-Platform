@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\PasswordController;
 use App\Http\Controllers\Public\EmailVerificationController;
 use App\Http\Controllers\Blogger\PostController as BloggerPostController;
 use App\Http\Controllers\Admin\AdminPostController;
+use App\Http\Controllers\Admin\UserController;
 
 // Public Routes
 Route::get('/posts', [PostController::class, 'index']); 
@@ -38,6 +39,8 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:admin,moderator'])->gr
 
     // Admin-only: create moderator
     Route::post('/create-moderator', [CreateModerator::class, 'store']);
+    Route::post('/user/{email}', [UserController::class, 'update']);
+    Route::get('/users', [UserController::class, 'index']);
 
     // Category CRUD
     Route::prefix('categories')->group(function () {

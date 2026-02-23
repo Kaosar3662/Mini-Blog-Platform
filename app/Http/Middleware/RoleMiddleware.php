@@ -18,7 +18,11 @@ class RoleMiddleware
     {
         $user = Auth::user();
 
-        if (!$user || !in_array($user->role, $roles)) {
+        if (
+            !$user ||
+            !in_array($user->role, $roles) ||
+            $user->status !== 'active'
+        ) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
