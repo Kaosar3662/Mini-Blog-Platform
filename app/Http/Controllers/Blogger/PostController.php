@@ -25,22 +25,33 @@ class PostController extends BaseController
     // List blogger's posts with pagination and filters
     public function index(Request $request)
     {
+        $search = request()->query('search');
         $limit = $request->query('limit', 10);
         $offset = $request->query('offset', 0);
 
-        $query = Post::where('user_id', Auth::id());
+        $query = Post::with('category:id,name')->where('user_id', Auth::id());
 
-        if ($request->has('category_id')) {
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('short_desc', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->query('category_id'));
         }
 
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->query('status'));
         }
 
         $total = $query->count();
-
-        $posts = $query->offset($offset)->limit($limit)->orderBy('created_at', 'desc')->get();
+        $posts = $query->offset($offset)
+            ->limit($limit)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return $this->sendResponse([
             'data' => $posts,

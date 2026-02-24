@@ -65,12 +65,17 @@ class UserController extends BaseController
         // Validate request
         $validated = $request->validate([
             'email' => ['sometimes', 'email', Rule::unique('users')->ignore($user->id)],
+            'name' => ['sometimes', 'string', 'min:3'],
             'password' => ['sometimes', 'string', 'min:6'],
             'status' => ['sometimes', Rule::in(['active', 'inactive'])],
             'role' => ['sometimes', Rule::in(['moderator', 'blogger'])],
         ]);
 
         // Update fields
+        if (isset($validated['name'])) {
+            $user->name = $validated['name'];
+        }
+        
         if (isset($validated['email'])) {
             $user->email = $validated['email'];
         }
