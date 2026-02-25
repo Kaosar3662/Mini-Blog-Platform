@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Public\PostController;
 use App\Http\Controllers\Public\CategoryController;
 use App\Http\Controllers\Admin\AdminCategoryController;
+use App\Http\Controllers\Admin\AdminContactMessageController;
 use App\Http\Controllers\Public\ContactMessageController;
 use App\Http\Controllers\Public\AuthController;
 use App\Http\Controllers\Admin\CreateModerator;
@@ -56,6 +57,10 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:admin,moderator'])->gr
     Route::get('/posts/{slug}', [AdminPostController::class, 'show']); 
     Route::put('/posts/{slug}/approve', [AdminPostController::class, 'approve']);
     Route::put('/posts/{slug}/reject', [AdminPostController::class, 'reject']);
+
+    // Contact Messages
+    Route::get('/messages', [AdminContactMessageController::class, 'index']);
+    Route::get('/messages/{id}', [AdminContactMessageController::class, 'show']);
 });
 
 // Authenticated blogger Routes

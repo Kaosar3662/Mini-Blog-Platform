@@ -69,6 +69,9 @@ class AuthController extends BaseController
                 'message' => 'Your account is Disabled or Deleted.'
             ], 403);
         }
+        if ($user->email_verified_at === null) {
+            return response()->json(['message' => 'Please verify your email first'], 403);
+        }
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return $this->sendError('The credentials are wrong.', null, 401);

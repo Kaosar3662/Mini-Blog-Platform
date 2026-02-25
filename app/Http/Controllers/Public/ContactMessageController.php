@@ -24,16 +24,19 @@ class ContactMessageController extends BaseController
         }
 
         try {
-            $contactMessage = ContactMessage::create($validator->validated());
+            $data = $validator->validated();
+            $data['status'] = 'unread';
+
+            $contactMessage = ContactMessage::create($data);
 
             return $this->sendResponse(
                 $contactMessage,
                 'Contact message submitted successfully.'
             );
-        } catch (Exception $e) {
+        } catch (Exception $error) {
             return $this->sendError(
                 'Something went wrong while submitting the message.',
-                ['error' => $e->getMessage()],
+                ['error' => $error->getMessage()],
                 500
             );
         }

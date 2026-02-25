@@ -20,11 +20,21 @@ class RoleMiddleware
 
         if (
             !$user ||
-            !in_array($user->role, $roles) ||
-            $user->status !== 'active'
+            !in_array($user->role, $roles)
+
         ) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
+
+        if ($user->status !== 'active') {
+            return response()->json(['message' => 'Account is disabled.'], 403);
+        }
+
+
+        if ($user->email_verified_at === null) {
+            return response()->json(['message' => 'Please verify your email before accessing this resource.'], 403);
+        }
+
 
         return $next($request);
     }
