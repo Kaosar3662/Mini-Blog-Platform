@@ -59,4 +59,13 @@ class AdminContactMessageController extends BaseController
 
         return $this->sendResponse($message, 'Message retrieved successfully.');
     }
+
+    // Soft delete message
+    public function destroy($id)
+    {
+        $message = ContactMessage::findOrFail($id);
+        $message->delete();
+
+        return $this->sendResponse(null, 'Message deleted successfully.');
+    }
 }

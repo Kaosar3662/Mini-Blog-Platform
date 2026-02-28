@@ -61,6 +61,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:admin,moderator'])->gr
     // Contact Messages
     Route::get('/messages', [AdminContactMessageController::class, 'index']);
     Route::get('/messages/{id}', [AdminContactMessageController::class, 'show']);
+    Route::delete('/messages/{id}', [AdminContactMessageController::class, 'destroy']);
 });
 
 // Authenticated blogger Routes

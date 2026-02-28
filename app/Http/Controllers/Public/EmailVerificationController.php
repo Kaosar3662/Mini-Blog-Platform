@@ -15,21 +15,21 @@ class EmailVerificationController extends BaseController
     public function verify(Request $request)
     {
         $request->validate([
-            'token' => 'required|string|exists:users,email_verification_token',
+            'token' => 'required|string',
         ]);
 
         $user = User::where('email_verification_token', $request->token)->first();
+
         if (!$user) {
             return $this->sendError('Invalid or expired token.', [], 404);
         }
 
-        // Check expiry
-        if ($user->email_verification_expires_at && Carbon::now()->greaterThan($user->email_verification_expires_at)) {
-            return $this->sendError('Verification link has expired.', [], 400);
-        }
-
         if ($user->hasVerifiedEmail()) {
             return $this->sendResponse([], 'Email already verified.');
+        }
+
+        if ($user->email_verification_expires_at && Carbon::now()->greaterThan($user->email_verification_expires_at)) {
+            return $this->sendError('Verification link has expired.', [], 410);
         }
 
         $user->markEmailAsVerified();
@@ -43,11 +43,15 @@ class EmailVerificationController extends BaseController
     // Resend verification email
     public function resend(Request $request)
     {
-        $request->validate([
-            'email' => 'required|string|email|exists:users,email',
-        ]);
 
-        $user = User::where('email', $request->email)->first();
+        if ($request->token) {
+            $user = User::where('email_verification_token', $request->token)->first();
+        } elseif ($request->email) {
+            $user = User::where('email', $request->email)->first();
+        } else {
+            return $this->sendError('Email or token is required.', [], 400);
+        }
+
         if (!$user) {
             return $this->sendError('User not found.', [], 404);
         }

@@ -28,8 +28,13 @@ class CreateModerator extends BaseController
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'email_verification_token' => null,
+            'email_verification_expires_at' => null,
             'role' => 'moderator',
         ]);
+
+        $moderator->markEmailAsVerified();
+        $moderator->save();
 
         return $this->sendResponse([
             'moderator' => $moderator->name,

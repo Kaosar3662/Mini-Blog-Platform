@@ -32,7 +32,7 @@ class RoleMiddleware
 
 
         if ($user->email_verified_at === null) {
-            return response()->json(['message' => 'Please verify your email before accessing this resource.'], 403);
+            return response()->json(['message' => "Please verify your email first"], 403);
         }
 
 
