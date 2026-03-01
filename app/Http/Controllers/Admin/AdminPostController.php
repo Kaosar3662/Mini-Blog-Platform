@@ -5,50 +5,20 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
+use App\Services\PostQueryService;
 use Carbon\Carbon;
 
 class AdminPostController extends BaseController
 {
     // List all posts with pagination and filters
-    public function index(Request $request)
+    public function index(Request $request, PostQueryService $service)
     {
-        $search = request()->query('search');
-        $limit = $request->query('limit', 10);
-        $offset = $request->query('offset', 0);
+        $query = Post::with(['category:id,name', 'user'])
+            ->whereNull('deleted_at');
 
+        $result = $service->filterAndPaginate($query, $request);
 
-        $query = Post::with('category:id,name')->where('user_id', Auth::id())->with('user');
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('short_desc', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
-            });
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->query('category_id'));
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->query('status'));
-        }
-
-        $query->whereNull('deleted_at');
-
-        $total = $query->count();
-        $posts = $query->offset($offset)->limit($limit)->orderBy('created_at', 'desc')->get();
-
-        return $this->sendResponse([
-            'data' => $posts,
-            'meta' => [
-                'limit' => (int)$limit,
-                'offset' => (int)$offset,
-                'total' => $total
-            ]
-        ], 'Posts retrieved successfully.');
+        return $this->sendResponse($result, 'Posts retrieved successfully.');
     }
 
     // View a single post

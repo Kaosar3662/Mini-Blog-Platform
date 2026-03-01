@@ -14,6 +14,8 @@ use App\Http\Controllers\Public\EmailVerificationController;
 use App\Http\Controllers\Blogger\PostController as BloggerPostController;
 use App\Http\Controllers\Admin\AdminPostController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Comment\CommentController;
+use App\Http\Controllers\Admin\AdminCommentController;
 
 // Public Routes
 Route::get('/posts', [PostController::class, 'index']); 
@@ -62,6 +64,12 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'role:admin,moderator'])->gr
     Route::get('/messages', [AdminContactMessageController::class, 'index']);
     Route::get('/messages/{id}', [AdminContactMessageController::class, 'show']);
     Route::delete('/messages/{id}', [AdminContactMessageController::class, 'destroy']);
+
+    Route::get('/comments', [AdminCommentController::class, 'index']);
+    Route::get('/comments/{id}', [AdminCommentController::class, 'show']);
+    Route::put('/comments/{id}/approve', [AdminCommentController::class, 'approve']);
+    Route::put('/comments/{id}/hide', [AdminCommentController::class, 'hide']);
+    Route::delete('/comments/{id}', [AdminCommentController::class, 'destroy']);
 });
 
 // Authenticated blogger Routes
@@ -71,6 +79,8 @@ Route::prefix('blogger')->middleware(['auth:sanctum' , 'role:admin,moderator,blo
     Route::post('/posts', [BloggerPostController::class, 'store']);
     Route::put('/posts/{slug}', [BloggerPostController::class, 'update']);
     Route::delete('/posts/{slug}', [BloggerPostController::class, 'destroy']);
+    Route::post('/posts/{slug}/comments', [CommentController::class, 'store']);
+    Route::post('/posts/{slug}/comments/{parentId}/reply', [CommentController::class, 'reply']);
 });
 
 // Authenticated user info

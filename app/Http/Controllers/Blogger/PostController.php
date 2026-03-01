@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PostQueryService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -22,47 +23,19 @@ class PostController extends BaseController
         'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
     ];
 
+
     // List blogger's posts with pagination and filters
-    public function index(Request $request)
+    public function index(Request $request, PostQueryService $service)
     {
-        $search = request()->query('search');
-        $limit = $request->query('limit', 10);
-        $offset = $request->query('offset', 0);
+        $query = Post::with('category:id,name')
+            ->where('user_id', Auth::id());
 
-        $query = Post::with('category:id,name')->where('user_id', Auth::id());
+        $result = $service->filterAndPaginate($query, $request);
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('short_desc', 'like', '%' . $search . '%')
-                    ->orWhere('content', 'like', '%' . $search . '%');
-            });
-        }
-
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->query('category_id'));
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->query('status'));
-        }
-
-        $total = $query->count();
-        $posts = $query->offset($offset)
-            ->limit($limit)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return $this->sendResponse([
-            'data' => $posts,
-            'meta' => [
-                'limit' => (int)$limit,
-                'offset' => (int)$offset,
-                'total' => $total
-            ]
-        ], 'Posts retrieved successfully.');
+        return $this->sendResponse($result, 'Posts retrieved successfully.');
     }
 
+    
     // View a single post
     public function show($slug)
     {
