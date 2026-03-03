@@ -54,7 +54,15 @@ class PostController extends BaseController
         $post = Post::where('slug', $slug)
             ->where('status', 'approved')
             ->whereNull('deleted_at')
-            ->with(['category:id,name', 'user:id,name'])
+            ->with([
+                'category:id,name',
+                'user:id,name',
+                'comments' => function ($q) {
+                    $q->where('status', 'approved')
+                      ->with('user:id,name')
+                      ->orderBy('created_at', 'desc');
+                }
+            ])
             ->first();
 
         if (!$post) {
